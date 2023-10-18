@@ -25,14 +25,16 @@ class SimplexSolver():
         self.prob = "max"
         self.gen_doc = False
         self.doc = ""
+        self.suffix = ""
 
     def run_simplex(self, A, b, c, prob='max', ineq=[],
-                    enable_msg=False, latex=False):
+                    enable_msg=False, latex=False, suffix=''):
         ''' Run simplex algorithm.
         '''
         self.prob = prob
         self.gen_doc = latex
         self.ineq = ineq
+        self.suffix = suffix
 
         # Create the header for the latex doc.        
         self.start_doc()
@@ -442,7 +444,7 @@ class SimplexSolver():
         if not self.gen_doc:
             return
         self.doc += (r"\end{document}")
-        with open(f"solution_{time.time()}.tex", "w") as tex:
+        with open(f"solution{self.suffix}.tex", "w") as tex:
             tex.write(self.doc)
 
     def _fraction_to_latex(self, fract):
