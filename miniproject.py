@@ -49,49 +49,58 @@ def simplex(A, b, c, m, n):
     start_time = time.time()
     SimplexSolver().run_simplex(A, b, c, prob="min", enable_msg=False, latex=False, suffix=suffix)
     end_time = time.time()
-    
     duration = end_time - start_time
+
+    return duration
+
+def capture_stats(stats, m, n, duration, print_details=False):
     key = f"m_{m} n_{n}"
     stats[key] = duration
-    print(f"Execution time for m = {m} and n = {n}:", duration, "seconds")
+    if print_details:
+        print(f"Execution time for m = {m} and n = {n}:", duration, "seconds")
 
-# m from 2 to 6 to 10 to 14. (in increments of 4)
-# n from 4 to 10 ... 50. (in increments of 10)
+def run_experiment():
+    # m from 2 to 6 to 10 to 14. (in increments of 4)
+    # n from 4 to 10 ... 50. (in increments of 10)
 
-# prime the base data
-A, b, c = base_data()
+    # prime the base data
+    A, b, c = base_data()
 
-stats = {}
-# for loop for m from 2 to 14 in increments of 4
-for m in range(2, 15, 4):
-    # for ever m we need to run the simplex for 4 variables 
-    # before jumping to 10 and incrementing by 10 up to 50
-    # as per the instructions
-    simplex(A, b, c, m, 4)
+    stats = {}
+    # for loop for m from 2 to 14 in increments of 4
+    for m in range(2, 15, 4):
+        # for ever m we need to run the simplex for 4 variables 
+        # before jumping to 10 and incrementing by 10 up to 50
+        # as per the instructions
+        duration = simplex(A, b, c, m, 4)
+        capture_stats(stats, m, 4, duration, print_details=True)
 
-    # for loop for n from 4 to 50 in increments of 10
-    for n in range(10, 51, 10):
-        # grow the data
-        A = grow_A(A, m, n)
-        b = grow_b(b, m)
-        c = grow_c(c, n)
-    
-        simplex(A, b, c, m, n)
+        # for loop for n from 4 to 50 in increments of 10
+        for n in range(10, 51, 10):
+            # grow the data
+            A = grow_A(A, m, n)
+            b = grow_b(b, m)
+            c = grow_c(c, n)
+        
+            duration = simplex(A, b, c, m, n)
+            capture_stats(stats, m, n, duration, print_details=True)     
 
-# set the style of the plot
-sns.set_theme(style="whitegrid")
+    # set the style of the plot
+    sns.set_theme(style="whitegrid")
 
-# create a new figure with a specified size
-plt.figure(figsize=(10, 10))
+    # create a new figure with a specified size
+    plt.figure(figsize=(10, 10))
 
-# set the title, x-axis label, and y-axis label for the plot
-plt.title("Execution Time for Simplex Algorithm")
-plt.xlabel("Matrix Size")
-plt.ylabel("Execution Time (seconds)")
-plt.xticks(rotation=90)
+    # set the title, x-axis label, and y-axis label for the plot
+    plt.title("Execution Time for Simplex Algorithm")
+    plt.xlabel("Matrix Size")
+    plt.ylabel("Execution Time (seconds)")
+    plt.xticks(rotation=90)
 
-# create a bar plot using the stats dictionary
-sns.barplot(x=list(stats.keys()), y=list(stats.values()))
+    # create a bar plot using the stats dictionary
+    sns.barplot(x=list(stats.keys()), y=list(stats.values()))
 
-# save the plot to a file and display it
-plt.savefig("execution_time.png")
+    # save the plot to a file and display it
+    plt.savefig("execution_time.png")
+
+run_experiment()
