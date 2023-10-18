@@ -3,7 +3,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from simplex import SimplexSolver
 
-# set the seed for the random number generator to 42 so that we get the same random numbers every time
+# set the seed for the random number generator to 42 so that we replicate the same results
 random.seed(42)
 
 def grow_A(A, grow_to_m, grow_to_n):
@@ -43,8 +43,20 @@ def base_data():
 
     return A, b, c
 
+def simplex(A, b, c, m, n):
+    # run simplex
+    suffix = "_m" + str(m) + "_n" + str(n)
+    start_time = time.time()
+    solution = SimplexSolver().run_simplex(A, b, c, prob="min", enable_msg=False, latex=False, suffix=suffix)
+    end_time = time.time()
+    
+    duration = end_time - start_time
+    key = f"{m}_{n}"
+    stats[key] = duration
+    print(f"Execution time for m = {m} and n = {n}:", duration, "seconds")
+
 # m from 2 to 6 to 10 to 14. (in increments of 4)
-# n from 4 to 10 to 50. (in increments of 10)
+# n from 4 to 10 ... 50. (in increments of 10)
 
 # prime the base data
 A, b, c = base_data()
@@ -52,24 +64,20 @@ A, b, c = base_data()
 stats = {}
 # for loop for m from 2 to 14 in increments of 4
 for m in range(2, 15, 4):
+    # for ever m we need to run the simplex for 4 variables 
+    # before jumping to 10 and incrementing by 10 up to 50
+    # as per the instructions
+    simplex(A, b, c, m, 4)
+
     # for loop for n from 4 to 50 in increments of 10
-    for n in range(4, 51, 10):
+    for n in range(10, 51, 10):
         # grow the data
         A = grow_A(A, m, n)
         b = grow_b(b, m)
         c = grow_c(c, n)
-        
-        # run simplex
-        suffix = "_m" + str(m) + "_n" + str(n)
-        start_time = time.time()
-        solution = SimplexSolver().run_simplex(A, b, c, prob="min", enable_msg=False, latex=False, suffix=suffix)
-        end_time = time.time()
-        
-        duration = end_time - start_time
-        key = f"m = {m}, n = {n}"
-        stats[key] = duration
-        print(f"Execution time for m = {m} and n = {n}:", duration, "seconds")
-        
+    
+        simplex(A, b, c, m, n)
+
 # set the style of the plot
 sns.set_theme(style="whitegrid")
 
@@ -80,11 +88,10 @@ plt.figure(figsize=(10, 10))
 plt.title("Execution Time for Simplex Algorithm")
 plt.xlabel("Matrix Size")
 plt.ylabel("Execution Time (seconds)")
+plt.xticks(rotation=90)
 
 # create a bar plot using the stats dictionary
 sns.barplot(x=list(stats.keys()), y=list(stats.values()))
 
 # save the plot to a file and display it
 plt.savefig("execution_time.png")
-plt.show()
-
