@@ -47,11 +47,11 @@ def simplex(A, b, c, m, n):
     # run simplex
     suffix = "_m" + str(m) + "_n" + str(n)
     start_time = time.time()
-    solution = SimplexSolver().run_simplex(A, b, c, prob="min", enable_msg=False, latex=False, suffix=suffix)
+    SimplexSolver().run_simplex(A, b, c, prob="min", enable_msg=False, latex=False, suffix=suffix)
     end_time = time.time()
     
     duration = end_time - start_time
-    key = f"{m}_{n}"
+    key = f"m_{m} n_{n}"
     stats[key] = duration
     print(f"Execution time for m = {m} and n = {n}:", duration, "seconds")
 
