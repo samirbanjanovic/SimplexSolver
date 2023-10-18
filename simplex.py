@@ -1,4 +1,4 @@
-import ast, getopt, sys, copy, os
+import ast, getopt, sys, copy, os, time
 from fractions import Fraction
 
 clear = lambda: os.system('cls' if os.name == 'nt' else 'clear')
@@ -296,7 +296,10 @@ class SimplexSolver():
             if x == 0:
                 continue
             if x < 0:
-                opp = ' - '
+                if x < -1:
+                    opp = ''
+                else:
+                    opp = ' - '
             elif index == 0 or not found_value:
                 opp = ''
             if x == 1 or x == -1:
@@ -305,6 +308,7 @@ class SimplexSolver():
             found_value = True
         self.doc += (r"\max{%s} \\ "
                      r"\end{equation*}" % func)
+        
         self.linear_system_doc(self.get_Ab())
         self.doc += (r"\begin{flushleft}"
                      r"\textbf{Solution}"
@@ -322,8 +326,11 @@ class SimplexSolver():
                 opp = '+'
                 if x == 0 and index != len(matrix[i]) - 1:
                     continue
-                if x < 0:
-                    opp = '-'
+                if x < 0:                    
+                    if x < -1:
+                        opp = ''
+                    else:
+                        opp = '-'
                 elif index == 0 or not found_value:
                     opp = ''
                 if index != len(matrix[i]) - 1:
@@ -435,7 +442,7 @@ class SimplexSolver():
         if not self.gen_doc:
             return
         self.doc += (r"\end{document}")
-        with open("solution.tex", "w") as tex:
+        with open(f"solution_{time.time()}.tex", "w") as tex:
             tex.write(self.doc)
 
     def _fraction_to_latex(self, fract):
