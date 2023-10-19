@@ -43,11 +43,11 @@ def base_data():
 
     return A, b, c
 
-def simplex(A, b, c, m, n):
+def simplex(A, b, c, m, n, create_latex=False):
     # run simplex
     suffix = "_m" + str(m) + "_n" + str(n)
     start_time = time.time()
-    SimplexSolver().run_simplex(A, b, c, prob="min", enable_msg=False, latex=False, suffix=suffix)
+    SimplexSolver().run_simplex(A, b, c, prob="min", enable_msg=False, latex=create_latex, suffix=suffix)
     end_time = time.time()
     duration = end_time - start_time
 
@@ -59,7 +59,7 @@ def capture_stats(stats, m, n, duration, print_details=False):
     if print_details:
         print(f"Execution time for m = {m} and n = {n}:", duration, "seconds")
 
-def run_experiment():
+def run_experiment(create_latex=False):
     # m from 2 to 6 to 10 to 14. (in increments of 4)
     # n from 4 to 10 ... 50. (in increments of 10)
 
@@ -72,7 +72,7 @@ def run_experiment():
         # for ever m we need to run the simplex for 4 variables 
         # before jumping to 10 and incrementing by 10 up to 50
         # as per the instructions
-        duration = simplex(A, b, c, m, 4)
+        duration = simplex(A, b, c, m, 4, create_latex)
         capture_stats(stats, m, 4, duration, print_details=True)
 
         # for loop for n from 4 to 50 in increments of 10
@@ -82,7 +82,7 @@ def run_experiment():
             b = grow_b(b, m)
             c = grow_c(c, n)
         
-            duration = simplex(A, b, c, m, n)
+            duration = simplex(A, b, c, m, n, create_latex)
             capture_stats(stats, m, n, duration, print_details=True)     
 
     # set the style of the plot
@@ -103,4 +103,4 @@ def run_experiment():
     # save the plot to a file and display it
     plt.savefig("execution_time.png")
 
-run_experiment()
+run_experiment(True)
