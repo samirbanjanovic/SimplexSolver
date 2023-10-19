@@ -72,7 +72,7 @@ def run_experiment(create_latex=False):
         # for ever m we need to run the simplex for 4 variables 
         # before jumping to 10 and incrementing by 10 up to 50
         # as per the instructions
-        duration = simplex(A, b, c, m, 4)
+        solution, duration = simplex(A, b, c, m, 4)
         capture_stats(stats, m, 4, duration, print_details=True)
         solutions.append(solution)
         for n in range(10, 51, 10):
@@ -81,7 +81,7 @@ def run_experiment(create_latex=False):
             b = grow_b(b, m)
             c = grow_c(c, n)
         
-            duration = simplex(A, b, c, m, n)
+            solution, duration = simplex(A, b, c, m, n)
             capture_stats(stats, m, n, duration, print_details=True)     
             solutions.append(solution)
             
