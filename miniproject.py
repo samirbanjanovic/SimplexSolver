@@ -47,11 +47,11 @@ def simplex(A, b, c, m, n, create_latex=False):
     # run simplex
     suffix = "_m" + str(m) + "_n" + str(n)
     start_time = time.time()
-    SimplexSolver().run_simplex(A, b, c, prob="min", enable_msg=False, latex=create_latex, suffix=suffix)
+    solution = SimplexSolver().run_simplex(A, b, c, prob="min", enable_msg=False, latex=False, suffix=suffix)
     end_time = time.time()
     duration = end_time - start_time
 
-    return duration
+    return solution, duration
 
 def capture_stats(stats, m, n, duration, print_details=False):
     key = f"m_{m} n_{n}"
@@ -67,24 +67,24 @@ def run_experiment(create_latex=False):
     A, b, c = base_data()
 
     stats = {}
-    # for loop for m from 2 to 14 in increments of 4
+    solutions = []
     for m in range(2, 15, 4):
         # for ever m we need to run the simplex for 4 variables 
         # before jumping to 10 and incrementing by 10 up to 50
         # as per the instructions
-        duration = simplex(A, b, c, m, 4, create_latex)
+        duration = simplex(A, b, c, m, 4)
         capture_stats(stats, m, 4, duration, print_details=True)
-
-        # for loop for n from 4 to 50 in increments of 10
+        solutions.append(solution)
         for n in range(10, 51, 10):
             # grow the data
             A = grow_A(A, m, n)
             b = grow_b(b, m)
             c = grow_c(c, n)
         
-            duration = simplex(A, b, c, m, n, create_latex)
+            duration = simplex(A, b, c, m, n)
             capture_stats(stats, m, n, duration, print_details=True)     
-
+            solutions.append(solution)
+            
     # set the style of the plot
     sns.set_theme(style="whitegrid")
 
