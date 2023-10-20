@@ -307,8 +307,9 @@ class SimplexSolver():
             if x == 1 or x == -1:
                 x = ''
             func += (r"%s %sx_%s "  % (opp, str(x), str(index+1)))
-            found_value = True
-        self.doc += (r"\max{%s} \\ "
+            found_value = True        
+        self.doc += (f"{self.prob}({r'{%s}'})"
+                     r"\\"
                      r"\end{equation*}" % func)
         
         self.linear_system_doc(self.get_Ab())
@@ -321,7 +322,7 @@ class SimplexSolver():
             return
         self.doc += (r"\["
                      r"\left\{"
-                     r"\begin{array}{c}")
+                     r"\begin{array}{c}")                     
         for i in range(0, len(matrix)):
             found_value = False
             for index, x in enumerate(matrix[i]):

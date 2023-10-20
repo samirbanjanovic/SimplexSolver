@@ -5,6 +5,10 @@ from simplex import SimplexSolver
 
 # set the seed for the random number generator to 42 so that we replicate the same results
 random.seed(42)
+m_start = 2
+m_end_ex = 15
+n_start = 10
+n_end_ex = 51
 
 def grow_A(A, grow_to_m, grow_to_n):
     # mutate base matrix to be m x n
@@ -43,11 +47,11 @@ def base_data():
 
     return A, b, c
 
-def simplex(A, b, c, m, n, create_latex=False):
+def simplex(A, b, c, m, n, create_latex=False, show_message=False):
     # run simplex
     suffix = "_m" + str(m) + "_n" + str(n)
     start_time = time.time()
-    solution = SimplexSolver().run_simplex(A, b, c, prob="min", enable_msg=False, latex=False, suffix=suffix)
+    solution = SimplexSolver().run_simplex(A, b, c, prob="min", enable_msg=show_message, latex=create_latex, suffix=suffix)
     end_time = time.time()
     duration = end_time - start_time
 
@@ -59,7 +63,7 @@ def capture_stats(stats, m, n, duration, print_details=False):
     if print_details:
         print(f"Execution time for m = {m} and n = {n}:", duration, "seconds")
 
-def run_experiment(create_latex=False):
+def run_experiment(create_latex=False, show_message=False):
     # m from 2 to 6 to 10 to 14. (in increments of 4)
     # n from 4 to 10 ... 50. (in increments of 10)
 
@@ -68,20 +72,20 @@ def run_experiment(create_latex=False):
 
     stats = {}
     solutions = []
-    for m in range(2, 15, 4):
+    for m in range(m_start, m_end_ex, 4):
         # for ever m we need to run the simplex for 4 variables 
         # before jumping to 10 and incrementing by 10 up to 50
         # as per the instructions
-        solution, duration = simplex(A, b, c, m, 4)
+        solution, duration = simplex(A, b, c, m, 4, create_latex=create_latex, show_message=show_message)
         capture_stats(stats, m, 4, duration, print_details=True)
         solutions.append(solution)
-        for n in range(10, 51, 10):
+        for n in range(n_start, n_end_ex, 10):
             # grow the data
             A = grow_A(A, m, n)
             b = grow_b(b, m)
             c = grow_c(c, n)
         
-            solution, duration = simplex(A, b, c, m, n)
+            solution, duration = simplex(A, b, c, m, n, create_latex=create_latex, show_message=show_message)
             capture_stats(stats, m, n, duration, print_details=True)     
             solutions.append(solution)
             
@@ -103,4 +107,7 @@ def run_experiment(create_latex=False):
     # save the plot to a file and display it
     plt.savefig("execution_time.png")
 
-run_experiment(True)
+run_experiment(create_latex=True, show_message=False)
+
+
+
